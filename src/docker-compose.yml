@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  budget.api:
+    image: ${DOCKER_REGISTRY-}budgetapi
+    build:
+      context: .
+      dockerfile: Services/Budget/Budget.API/Dockerfile
+      
+  identity.api:
+    image: ${DOCKER_REGISTRY-}identityapi
+    build:
+      context: .
+      dockerfile: Services/Identity/Identity.API/Dockerfile
