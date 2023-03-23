@@ -14,7 +14,7 @@ public class ExpenseDtoValidator : AbstractValidator<ExpenseDto>
         RuleFor(x => x.Description)
             .NotEmpty();
 
-        RuleFor(x => x.ExpenseCategory)
+        RuleFor(x => x.Category)
             .IsInEnum();
     }
 }

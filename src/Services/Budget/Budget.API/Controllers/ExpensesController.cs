@@ -1,9 +1,8 @@
-using Budget.Application.Commands;
 using Budget.Application.Dtos;
-using Budget.Application.Queries;
+using Budget.Application.Errors;
+using Budget.Application.Requests;
 
 using FluentResults;
-using FluentResults.Extensions.AspNetCore;
 
 using MediatR;
 
@@ -23,53 +22,105 @@ public class ExpensesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ExpenseDto dto)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<ExpenseDto>> CreateAsync([FromBody] ExpenseDto dto)
     {
-        var command = new CreateExpenseCommand(dto);
-        var result = await _mediator.Send(command);
-        return result.ToActionResult();
+        var request = new CreateExpenseRequest(dto);
+        var result = await _mediator.Send(request);
+
+        if (result.HasError<ValidationError>())
+            return ValidationProblem();
+
+        if (result.HasError<ConflictError>())
+            return Conflict();
+
+        return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Value.Id }, result.Value);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ExpenseDto>> DeleteAsync(int id)
     {
-        var command = new DeleteExpenseCommand(id);
-        var result = await _mediator.Send(command);
-        return result.ToActionResult();
+        var request = new DeleteExpenseRequest(id);
+        var result = await _mediator.Send(request);
+
+        if (result.HasError<ValidationError>())
+            return ValidationProblem();
+
+        if (result.HasError<NotFoundError>())
+            return NotFound();
+
+        return Ok(result.Value);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetByDescriptionOrGetAll(string? description = null)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IEnumerable<ExpenseDto>> GetByDescriptionOrGetAllAsync(string? description = null)
     {
-        IRequest<Result<IEnumerable<ExpenseDto>>> query = (description is not null)
-            ? new GetExpensesByDescriptionSnippetQuery(description)
-            : new GetExpensesQuery();
+        IRequest<Result<IEnumerable<ExpenseDto>>> request = (description is not null)
+            ? new GetExpensesByDescriptionSnippetRequest(description)
+            : new GetExpensesRequest();
 
-        var result = await _mediator.Send(query);
-        return result.ToActionResult();
+        var result = await _mediator.Send(request);
+
+        return result.Value;
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetByIdAsync(int id)
     {
-        var query = new GetExpenseByIdQuery(id);
-        var result = await _mediator.Send(query);
-        return result.ToActionResult();
+        var request = new GetExpenseByIdRequest(id);
+        var result = await _mediator.Send(request);
+
+        if (result.HasError<ValidationError>())
+            return ValidationProblem();
+
+        if (result.HasError<NotFoundError>())
+            return NotFound();
+
+        return Ok(result.Value);
     }
 
     [HttpGet("{year}/{month}")]
-    public async Task<IActionResult> GetByMonth(int month, int year)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<ExpenseDto>>> GetByMonthAsync(int month, int year)
     {
-        var query = new GetExpensesByMonthQuery(month, year);
-        var result = await _mediator.Send(query);
-        return result.ToActionResult();
+        var request = new GetExpensesByMonthRequest(month, year);
+        var result = await _mediator.Send(request);
+
+        if (result.HasError<ValidationError>())
+            return ValidationProblem();
+
+        return Ok(result.Value);
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] ExpenseDto dto)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> UpdateAsync([FromBody] ExpenseDto dto)
     {
-        var command = new UpdateExpenseCommand(dto);
+        var command = new UpdateExpenseRequest(dto);
         var result = await _mediator.Send(command);
-        return result.ToActionResult();
+
+        if (result.HasError<ValidationError>())
+            return ValidationProblem();
+
+        if (result.HasError<NotFoundError>())
+            return NotFound();
+
+        if (result.HasError<ConflictError>())
+            return Conflict();
+
+        return Ok(result.Value);
     }
 }

@@ -1,5 +1,6 @@
 using System.Reflection;
 
+using Budget.Application.Behaviors;
 using Budget.Domain.AggregateModels.ExpenseAggregates;
 using Budget.Domain.AggregateModels.IncomeAggregates;
 using Budget.Domain.SeedWork;
@@ -9,6 +10,8 @@ using Budget.Infrastructure.Data.Repositories;
 using Budget.Infrastructure.Data.Seed;
 
 using FluentValidation;
+
+using MediatR;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -22,12 +25,8 @@ public static class StartupExtensions
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddDbContext<BudgetContext>(options =>
-        {
-            options.UseSqlServer("Name=BudgetConnection",
-                sqlOptions => sqlOptions.MigrationsAssembly("Budget.Infrastructure"));
-
-            options.EnableSensitiveDataLogging();
-        });
+            options.UseSqlServer("Name=BudgetConnection", sqlOptions =>
+                sqlOptions.MigrationsAssembly("Budget.Infrastructure")));
 
         builder.Services.AddScoped<ISeeder, DemoDataSeeder>();
 
@@ -38,10 +37,12 @@ public static class StartupExtensions
 
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        builder.Services.AddMediatR(config =>
-            config.RegisterServicesFromAssembly(Assembly.Load("Budget.Application")));
+        builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.Load("Budget.Application")))
+            .AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
         builder.Services.AddValidatorsFromAssembly(Assembly.Load("Budget.Application"));
+
+        builder.Services.AddAutoMapper(Assembly.Load("Budget.Application"));
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer("Bearer", options =>
@@ -58,41 +59,47 @@ public static class StartupExtensions
 
 
         builder.Services.AddAuthorization(options => options.AddPolicy("ApiScope", policy =>
-            {
-                policy.RequireAuthenticatedUser();
-                policy.RequireClaim("scope", "budget");
-            }));
+        {
+            policy.RequireAuthenticatedUser();
+            policy.RequireClaim("scope", "budget-api");
+        }));
 
         builder.Services.AddControllers();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new() { Title = "Budget.API", Version = "v1" });
 
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
             {
-                Name = "Authorization",
-                Description = "Enter the Bearer Authorization string as following: `Bearer {token-without-brackets}`",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey,
-                Scheme = JwtBearerDefaults.AuthenticationScheme
+                Type = SecuritySchemeType.OAuth2,
+                Scheme = "oauth2",
+                Description = "OAuth2 Authorization",
+                Flows = new OpenApiOAuthFlows
+                {
+                    ClientCredentials = new OpenApiOAuthFlow
+                    {
+                        TokenUrl = new Uri(builder.Configuration["Swagger:OAuth2:TokenUrl"] ?? throw new InvalidOperationException()),
+                        Scopes =
+                        {
+                            ["budget-api"] = "Budget API"
+                        }
+                    }
+                }
             });
 
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
-                    new OpenApiSecurityScheme
-                    {
-                        Name = "Bearer",
-                        In = ParameterLocation.Header,
-                        Reference = new OpenApiReference
-                        {
-                            Id = "Bearer",
+                    new OpenApiSecurityScheme{
+                        Name = "oauth2",
+                        Reference = new OpenApiReference{
+                            Id = "oauth2",
                             Type = ReferenceType.SecurityScheme
                         }
                     },
-                    new List<string>()
+                    Array.Empty<string>()
                 }
             });
         });
@@ -102,14 +109,17 @@ public static class StartupExtensions
 
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Budget.API v1"));
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Budget.API v1");
+                c.OAuthClientId("budget-swagger");
+                c.OAuthClientSecret("secret");
+                c.OAuthScopes("budget-api");
+            });
         }
-
-        app.UseHttpsRedirection();
 
         app.UseAuthentication();
         app.UseAuthorization();

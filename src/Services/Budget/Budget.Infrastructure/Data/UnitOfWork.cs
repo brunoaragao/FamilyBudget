@@ -1,7 +1,5 @@
 using Budget.Domain.SeedWork;
 
-using Microsoft.EntityFrameworkCore;
-
 namespace Budget.Infrastructure.Data;
 
 public class UnitOfWork : IUnitOfWork
@@ -13,8 +11,8 @@ public class UnitOfWork : IUnitOfWork
         _context = context;
     }
 
-    public async Task<int> CommitAsync(CancellationToken cancellationToken = default)
+    void IUnitOfWork.Commit()
     {
-        return await _context.SaveChangesAsync(cancellationToken);
+        _context.SaveChanges();
     }
 }

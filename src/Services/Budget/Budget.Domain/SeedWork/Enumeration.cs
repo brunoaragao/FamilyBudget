@@ -1,7 +1,5 @@
 using System.Reflection;
 
-using Budget.Domain.Exceptions;
-
 namespace Budget.Domain.SeedWork;
 
 public abstract class Enumeration : ValueObject, IComparable
@@ -50,8 +48,7 @@ public abstract class Enumeration : ValueObject, IComparable
     private static T Parse<T, K>(K value, string description, Func<T, bool> predicate) where T : Enumeration
     {
         var matchingItem = GetAll<T>().FirstOrDefault(predicate);
-
-        return matchingItem is null ? throw new DomainException($"'{value}' is not a valid {description} in {typeof(T)}") : matchingItem;
+        return matchingItem ?? throw new InvalidOperationException($"'{value}' is not a valid {description} in {typeof(T)}");
     }
 
     protected override IEnumerable<object> GetEqualityComponents()

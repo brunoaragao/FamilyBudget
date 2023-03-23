@@ -1,12 +1,12 @@
-using Budget.Application.Queries;
+using Budget.Application.Requests;
 
 using FluentValidation;
 
 namespace Budget.Application.Validators;
 
-public class GetMonthlySummaryQueryValidator : AbstractValidator<GetMonthlySummaryQuery>
+public class GetMonthlySummaryRequestValidator : AbstractValidator<GetMonthlySummaryRequest>
 {
-    public GetMonthlySummaryQueryValidator()
+    public GetMonthlySummaryRequestValidator()
     {
         RuleFor(x => x.Month)
             .InclusiveBetween(1, 12);

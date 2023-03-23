@@ -1,6 +1,5 @@
 using Budget.Domain.AggregateModels.ExpenseAggregates;
 using Budget.Domain.AggregateModels.IncomeAggregates;
-using Budget.Domain.SeedWork;
 using Budget.Infrastructure.Data.Repositories;
 
 using Microsoft.EntityFrameworkCore;
@@ -47,9 +46,8 @@ public class DemoDataSeeder : ISeeder
             var description = $"Expense {i}";
             var date = DateTime.UtcNow.AddDays(-random.Next(1, 30));
             var categoryId = random.Next(1, 9);
-            var category = Enumeration.FromValue<ExpenseCategory>(categoryId);
 
-            expenses.Add(new Expense(repository, amount, description, date, category));
+            expenses.Add(new Expense(repository, amount, description, date, categoryId));
         }
 
         return expenses;

@@ -1,17 +1,14 @@
-using Budget.Application.Commands;
-using Budget.Domain.AggregateModels.ExpenseAggregates;
+using Budget.Application.Requests;
 
 using FluentValidation;
 
 namespace Budget.Application.Validators;
 
-public class DeleteExpenseCommandValidator : AbstractValidator<DeleteExpenseCommand>
+public class DeleteExpenseRequestValidator : AbstractValidator<DeleteExpenseRequest>
 {
-    public DeleteExpenseCommandValidator(IExpenseRepository repository)
+    public DeleteExpenseRequestValidator()
     {
         RuleFor(x => x.Id)
-            .GreaterThan(0)
-            .DependentRules(() => RuleFor(x => x.Id)
-                    .Must(id => repository.ExistsExpenseWithId(id)));
+            .GreaterThan(0);
     }
 }

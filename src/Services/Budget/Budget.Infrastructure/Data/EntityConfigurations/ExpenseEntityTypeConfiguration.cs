@@ -22,19 +22,19 @@ public class ExpenseEntityTypeConfiguration : IEntityTypeConfiguration<Expense>
         builder.Property(e => e.Date)
             .HasColumnType("date");
 
-        builder.HasIndex(e => new { e.Description, e.Date });
+        builder.Property(e => e.CategoryId)
+            .HasColumnName("ExpenseCategoryId");
 
-        builder.Property<int>("ExpenseCategoryId");
-
-        builder.HasOne(e => e.ExpenseCategory)
+        builder.HasOne(e => e.Category)
             .WithMany()
-            .HasForeignKey("ExpenseCategoryId");
+            .HasForeignKey(e => e.CategoryId);
+
+        builder.HasIndex(e => new { e.CategoryId, e.Date });
 
         builder.HasIndex(e => new { e.Date });
 
+        builder.HasIndex(e => new { e.Date, e.Description });
+
         builder.HasIndex(e => new { e.Description });
-
-        builder.HasIndex("Date", "ExpenseCategoryId");
-
     }
 }

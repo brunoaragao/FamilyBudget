@@ -1,5 +1,4 @@
 using Budget.Domain.AggregateModels.ExpenseAggregates;
-using Budget.Domain.Exceptions;
 using Budget.Domain.SeedWork;
 
 namespace Budget.UnitTests.Domain;
@@ -27,12 +26,12 @@ public class ExpenseCategoryTest
     [Theory]
     [InlineData(0)]
     [InlineData(9)]
-    public void FromValue_WithInvalidId_ShouldThrowDomainException(int id)
+    public void FromValue_WithInvalidId_ShouldThrowInvalidOperationException(int id)
     {
         // Act
         var act = new Action(() => _ = Enumeration.FromValue<ExpenseCategory>(id));
 
         // Assert
-        Assert.Throws<DomainException>(act);
+        Assert.Throws<InvalidOperationException>(act);
     }
 }

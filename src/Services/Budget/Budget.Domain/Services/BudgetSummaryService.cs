@@ -1,5 +1,6 @@
 using Budget.Domain.AggregateModels.ExpenseAggregates;
 using Budget.Domain.AggregateModels.IncomeAggregates;
+using Budget.Domain.Exceptions;
 
 namespace Budget.Domain.Services;
 
@@ -14,9 +15,18 @@ public class BudgetSummaryService : IBudgetSummaryService
         _expenseRepository = expenseRepository;
     }
 
-    // MonthlySummary
     public MonthlyBudgetSummaryModel GetMonthlySummary(int month, int year)
     {
+        if (month < 1 || month > 12)
+        {
+            throw new DomainException("Month must be between 1 and 12");
+        }
+
+        if (year < 1 || year > 9999)
+        {
+            throw new DomainException("Year must be between 1 and 9999");
+        }
+
         var incomes = _incomeRepository.GetIncomesByMonth(month, year);
         var expenses = _expenseRepository.GetExpensesByMonth(month, year);
 
@@ -27,10 +37,10 @@ public class BudgetSummaryService : IBudgetSummaryService
             IncomeSum = incomes.Sum(x => x.Amount),
             ExpenseSum = expenses.Sum(x => x.Amount),
             Balance = incomes.Sum(x => x.Amount) - expenses.Sum(x => x.Amount),
-            CategorizedExpenses = expenses.GroupBy(x => x.ExpenseCategory)
+            CategorizedExpenses = expenses.GroupBy(x => x.CategoryId)
                 .Select(g => new CategorizedExpenseModel
                 {
-                    Category = g.Key,
+                    CategoryId = g.Key,
                     AmountSum = g.Sum(c => c.Amount)
                 })
         };

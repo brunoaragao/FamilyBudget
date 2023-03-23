@@ -41,14 +41,14 @@ public class ExpenseRepository : IExpenseRepository
     public Expense GetExpenseById(int id)
     {
         return _context.Expenses
-            .Include(x => x.ExpenseCategory)
+            .Include(x => x.Category)
             .Single(x => x.Id == id);
     }
 
     public IEnumerable<Expense> GetExpenses()
     {
         return _context.Expenses
-            .Include(x => x.ExpenseCategory)
+            .Include(x => x.Category)
             .ToList();
     }
 
@@ -62,7 +62,7 @@ public class ExpenseRepository : IExpenseRepository
     public IEnumerable<Expense> GetExpensesByMonth(int month, int year)
     {
         return _context.Expenses
-            .Include(x => x.ExpenseCategory)
+            .Include(x => x.Category)
             .Where(x => x.Date.Month == month && x.Date.Year == year)
             .ToList();
     }

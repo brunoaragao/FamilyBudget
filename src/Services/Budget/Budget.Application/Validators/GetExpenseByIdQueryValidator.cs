@@ -1,17 +1,14 @@
-using Budget.Application.Queries;
-using Budget.Domain.AggregateModels.ExpenseAggregates;
+using Budget.Application.Requests;
 
 using FluentValidation;
 
 namespace Budget.Application.Validators;
 
-public class GetExpenseByIdQueryValidator : AbstractValidator<GetExpenseByIdQuery>
+public class GetExpenseByIdRequestValidator : AbstractValidator<GetExpenseByIdRequest>
 {
-    public GetExpenseByIdQueryValidator(IExpenseRepository repository)
+    public GetExpenseByIdRequestValidator()
     {
         RuleFor(x => x.Id)
-            .GreaterThan(0)
-            .DependentRules(() => RuleFor(x => x.Id)
-                    .Must(id => repository.ExistsExpenseWithId(id)));
+            .GreaterThan(0);
     }
 }

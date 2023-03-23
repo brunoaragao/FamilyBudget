@@ -10,97 +10,106 @@ public class ExpenseTest
 
     public ExpenseTest()
     {
-        _repositoryMock = new();
+        _repositoryMock = new Mock<IExpenseRepository>();
         _repository = _repositoryMock.Object;
     }
 
+    private Expense DefaultExpense => new(_repository, 1, "Test", default, 1);
+    private static (decimal, string, DateTime, int) ValidConstructorParameters => (1, "Test", default, 1);
+    private static (decimal, string, DateTime, int) ValidUpdateParameters => (2, "Test 2", default, 2);
+
+    private static (decimal, string, int) InvalidUpdateParameters => (0, string.Empty, 0);
+
+
     [Fact]
-    public void Constructor_ShouldSetProperties()
+    public void Constructor_ByDefault_ShouldSetProperties()
     {
         // Arrange
-        var (amount, description, date, category) = GetValidConstructorParameters();
+        var (amount, description, date, categoryId) = ValidConstructorParameters;
 
         // Act
-        var expense = new Expense(_repository, amount, description, date, category);
+        var expense = new Expense(_repository, amount, description, date, categoryId);
 
         // Assert
         Assert.Equal(amount, expense.Amount);
         Assert.Equal(description, expense.Description);
         Assert.Equal(date, expense.Date);
-        Assert.Equal(category, expense.ExpenseCategory);
+        Assert.Equal(categoryId, expense.CategoryId);
     }
 
     [Fact]
-    public void Constructor_WhenCategoryIsNotProvided_ShouldSetCategoryToOthers()
+    public void Constructor_WhenCategoryIdIsNotProvided_ShouldSetCategoryIdToOthersId()
     {
         // Arrange
-        var (amount, description, date, _) = GetValidConstructorParameters();
+        var (amount, description, date, _) = ValidConstructorParameters;
 
         // Act
         var expense = new Expense(_repository, amount, description, date);
 
         // Assert
-        Assert.Equal(ExpenseCategory.Others, expense.ExpenseCategory);
+        Assert.Equal(ExpenseCategory.Others.Id, expense.CategoryId);
     }
 
     [Fact]
     public void Constructor_WhenExpenseWithSameDescriptionAndMonthAlreadyExists_ShouldThrowDomainException()
     {
         // Arrange
-        var (amount, description, date, category) = GetValidConstructorParameters();
+        var (amount, description, date, categoryId) = ValidConstructorParameters;
 
         _repositoryMock
             .Setup(r => r.ExistsExpenseWithDescriptionAndMonth(description, date.Month, date.Year))
             .Returns(true);
 
         // Act
-        var act = new Action(() => _ = new Expense(_repository, amount, description, date, category));
+        var act = new Action(() => _ = new Expense(_repository, amount, description, date, categoryId));
 
         // Assert
         Assert.Throws<DomainException>(act);
     }
 
     [Theory]
-    [InlineData(0, "Test")]
-    [InlineData(-1, "Test")]
-    [InlineData(100, null)]
-    [InlineData(100, "")]
-    [InlineData(100, " ")]
-    public void Constructor_WhenParametersAreInvalid_ShouldThrowDomainException(decimal amount, string description)
+    [InlineData(0, "Test", 1)]
+    [InlineData(-1, "Test", 1)]
+    [InlineData(1, null, 1)]
+    [InlineData(1, "", 1)]
+    [InlineData(1, " ", 1)]
+    [InlineData(1, "Test", 0)]
+    [InlineData(1, "Test", 9)]
+    public void Constructor_WhenParametersAreInvalid_ShouldThrowDomainException(decimal amount, string description, int categoryId)
     {
         // Arrange
-        var (_, _, date, category) = GetValidConstructorParameters();
+        var (_, _, date, _) = ValidConstructorParameters;
 
         // Act
-        var act = new Action(() => _ = new Expense(_repository, amount, description, date, category));
+        var act = new Action(() => _ = new Expense(_repository, amount, description, date, categoryId));
 
         // Assert
         Assert.Throws<DomainException>(act);
     }
 
     [Fact]
-    public void Update_ShouldSetProperties()
+    public void Update_ByDefault_ShouldSetProperties()
     {
         // Arrange
-        var expense = GetValidExpense();
-        var (amount, description, date, category) = GetValidUpdateParameters();
+        var expense = DefaultExpense;
+        var (amount, description, date, categoryId) = ValidUpdateParameters;
 
         // Act
-        expense.Update(_repository, amount, description, date, category);
+        expense.Update(_repository, amount, description, date, categoryId);
 
         // Assert
         Assert.Equal(amount, expense.Amount);
         Assert.Equal(description, expense.Description);
         Assert.Equal(date, expense.Date);
-        Assert.Equal(category, expense.ExpenseCategory);
+        Assert.Equal(categoryId, expense.CategoryId);
     }
 
     [Fact]
     public void Update_WhenExpenseWithSameDescriptionAndMonthAlreadyExists_ShouldThrowDomainException()
     {
         // Arrange
-        var expense = GetValidExpense();
-        var (amount, description, date, category) = GetValidUpdateParameters();
+        var expense = DefaultExpense;
+        var (amount, description, date, category) = ValidUpdateParameters;
 
         _repositoryMock
             .Setup(r => r.ExistsAnotherExpenseWithDescriptionAndMonth(expense.Id, description, date.Month, date.Year))
@@ -114,19 +123,21 @@ public class ExpenseTest
     }
 
     [Theory]
-    [InlineData(0, "Test")]
-    [InlineData(-1, "Test")]
-    [InlineData(100, null)]
-    [InlineData(100, "")]
-    [InlineData(100, " ")]
-    public void Update_WhenParametersAreInvalid_ShouldThrowDomainException(decimal amount, string description)
+    [InlineData(0, "Test", 1)]
+    [InlineData(-1, "Test", 1)]
+    [InlineData(1, null, 1)]
+    [InlineData(1, "", 1)]
+    [InlineData(1, " ", 1)]
+    [InlineData(1, "Test", 0)]
+    [InlineData(1, "Test", 9)]
+    public void Update_WhenParametersAreInvalid_ShouldThrowDomainException(decimal amount, string description, int categoryId)
     {
         // Arrange
-        var expense = GetValidExpense();
-        var (_, _, date, category) = GetValidUpdateParameters();
+        var expense = DefaultExpense;
+        var (_, _, date, _) = ValidUpdateParameters;
 
         // Act
-        var act = new Action(() => expense.Update(_repository, amount, description, date, category));
+        var act = new Action(() => expense.Update(_repository, amount, description, date, categoryId));
 
         // Assert
         Assert.Throws<DomainException>(act);
@@ -136,55 +147,21 @@ public class ExpenseTest
     public void Update_WhenParametersAreInvalid_ShouldNotChangeProperties()
     {
         // Arrange
-        var (initialAmount, initialDescription, initialDate, initialCategory) = GetValidConstructorParameters();
+        var (initialAmount, initialDescription, initialDate, initialCategoryId) = ValidConstructorParameters;
 
-        var (amount, description) = GetInvalidUpdateParameters();
-        var (_, _, date, category) = GetValidUpdateParameters();
+        var (newAmount, newDescription, newCategoryId) = InvalidUpdateParameters;
+        var (_, _, newDate, _) = ValidUpdateParameters;
 
-        var expense = new Expense(_repository, initialAmount, initialDescription, initialDate, initialCategory);
+        var expense = new Expense(_repository, initialAmount, initialDescription, initialDate, initialCategoryId);
 
         // Act
-        var act = new Action(() => expense.Update(_repository, amount, description, date, category));
+        var act = new Action(() => expense.Update(_repository, newAmount, newDescription, newDate, newCategoryId));
 
         // Assert
         Assert.Throws<DomainException>(act);
         Assert.Equal(initialAmount, expense.Amount);
         Assert.Equal(initialDescription, expense.Description);
         Assert.Equal(initialDate, expense.Date);
-        Assert.Equal(initialCategory, expense.ExpenseCategory);
-    }
-
-    private Expense GetValidExpense()
-    {
-        var (amount, description, date, category) = GetValidConstructorParameters();
-        return new(_repository, amount, description, date, category);
-    }
-
-    private static (decimal, string, DateTime, ExpenseCategory) GetValidConstructorParameters()
-    {
-        var amount = 100M;
-        var description = "Test";
-        var date = DateTime.UtcNow;
-        var category = ExpenseCategory.Others;
-
-        return (amount, description, date, category);
-    }
-
-    private static (decimal, string, DateTime, ExpenseCategory) GetValidUpdateParameters()
-    {
-        var amount = 200M;
-        var description = "Test 2";
-        var date = DateTime.UtcNow.AddMonths(1);
-        var category = ExpenseCategory.Food;
-
-        return (amount, description, date, category);
-    }
-
-    private static (decimal, string) GetInvalidUpdateParameters()
-    {
-        var amount = 0M;
-        var description = string.Empty;
-
-        return (amount, description);
+        Assert.Equal(initialCategoryId, expense.CategoryId);
     }
 }

@@ -1,12 +1,12 @@
-using Budget.Application.Queries;
+using Budget.Application.Requests;
 
 using FluentValidation;
 
 namespace Budget.Application.Validators;
 
-public class GetExpensesByDescriptionSnippetQueryValidator : AbstractValidator<GetExpensesByDescriptionSnippetQuery>
+public class GetExpensesByDescriptionSnippetRequestValidator : AbstractValidator<GetExpensesByDescriptionSnippetRequest>
 {
-    public GetExpensesByDescriptionSnippetQueryValidator()
+    public GetExpensesByDescriptionSnippetRequestValidator()
     {
         RuleFor(x => x.DescriptionSnippet)
             .NotEmpty();

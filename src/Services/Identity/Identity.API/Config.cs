@@ -5,15 +5,12 @@ namespace Identity.API;
 public static class Config
 {
     public static IEnumerable<IdentityResource> IdentityResources =>
-        new IdentityResource[]
-        {
-            new IdentityResources.OpenId()
-        };
+        Array.Empty<IdentityResource>();
 
     public static IEnumerable<ApiScope> ApiScopes =>
         new ApiScope[]
             {
-                new ApiScope("budget", "Budgeting API")
+                new ApiScope("budget-api", "Budgeting API")
             };
 
     public static IEnumerable<Client> Clients(IConfiguration configuration) =>
@@ -21,11 +18,13 @@ public static class Config
             {
                 new Client
                 {
-                    ClientId = "client",
+                    ClientId = "budget-swagger",
                     AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    AllowedScopes = { "budget-api" },
 
-                    ClientSecrets = { new Secret(configuration["ClientSecrets:Client"].Sha256()) },
-                    AllowedScopes = { "budget" }
+                    ClientSecrets = { new Secret(configuration["Clients:BudgetSwagger:Secret"].Sha256()) },
+
+                    AllowedCorsOrigins = configuration["Clients:BudgetSwagger:AllowedCorsOrigins"].Split(","),
                 }
             };
 }

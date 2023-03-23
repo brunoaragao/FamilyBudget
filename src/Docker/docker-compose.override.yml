@@ -1,0 +1,40 @@
+version: '3.4'
+
+services:
+  budget-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__BudgetConnection=Server=sqlserver;Database=Budget;User Id=sa;Password=Password123!;Trusted_Connection=False; TrustServerCertificate=True;MultipleActiveResultSets=true
+      - Swagger__OAuth2__TokenUrl=http://localhost:5001/connect/token
+      - IdentityServer__Authority=http://identity-api
+    ports:
+      - "5000:80"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    restart: on-failure
+
+  identity-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - Clients__BudgetSwagger__Secret=secret
+      - Clients__BudgetSwagger__AllowedCorsOrigins=http://localhost:5000
+    ports:
+      - "5001:80"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  sqlserver:
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Password123!
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+
+volumes:
+  sqlserver-data:

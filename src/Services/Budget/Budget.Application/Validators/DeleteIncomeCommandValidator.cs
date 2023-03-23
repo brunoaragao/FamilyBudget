@@ -1,17 +1,14 @@
-using Budget.Application.Commands;
-using Budget.Domain.AggregateModels.IncomeAggregates;
+using Budget.Application.Requests;
 
 using FluentValidation;
 
 namespace Budget.Application.Validators;
 
-public class DeleteIncomeCommandValidator : AbstractValidator<DeleteIncomeCommand>
+public class DeleteIncomeRequestValidator : AbstractValidator<DeleteIncomeRequest>
 {
-    public DeleteIncomeCommandValidator(IIncomeRepository repository)
+    public DeleteIncomeRequestValidator()
     {
         RuleFor(x => x.Id)
-            .GreaterThan(0)
-            .DependentRules(() => RuleFor(x => x.Id)
-                    .Must(id => repository.ExistsIncomeWithId(id)));
+            .GreaterThan(0);
     }
 }

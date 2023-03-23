@@ -34,6 +34,10 @@ namespace Budget.Infrastructure.Data.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int")
+                        .HasColumnName("ExpenseCategoryId");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("date");
 
@@ -42,20 +46,15 @@ namespace Budget.Infrastructure.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("ExpenseCategoryId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Date");
 
                     b.HasIndex("Description");
 
-                    b.HasIndex("ExpenseCategoryId");
+                    b.HasIndex("CategoryId", "Date");
 
-                    b.HasIndex("Date", "ExpenseCategoryId");
-
-                    b.HasIndex("Description", "Date");
+                    b.HasIndex("Date", "Description");
 
                     b.ToTable("Expense", "Budget");
                 });
@@ -98,7 +97,7 @@ namespace Budget.Infrastructure.Data.Migrations
                         new
                         {
                             Id = 5,
-                            Name = "Transport"
+                            Name = "Transportation"
                         },
                         new
                         {
@@ -149,7 +148,7 @@ namespace Budget.Infrastructure.Data.Migrations
                 {
                     b.HasOne("Budget.Domain.AggregateModels.ExpenseAggregates.ExpenseCategory", "Category")
                         .WithMany()
-                        .HasForeignKey("ExpenseCategoryId")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
