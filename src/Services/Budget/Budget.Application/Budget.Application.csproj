@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Budget.Infrastructure\Budget.Infrastructure.csproj" />
     <ProjectReference Include="..\Budget.Domain\Budget.Domain.csproj" />
   </ItemGroup>
 

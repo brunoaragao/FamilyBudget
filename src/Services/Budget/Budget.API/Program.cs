@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder
     .ConfigureServices()
-    .ConfigurePipeline();
+    .ConfigureApp();
 
 await app.SeedData();
 

@@ -25,7 +25,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Budget.Domain\Budget.Domain.csproj" />
     <ProjectReference Include="..\Budget.Application\Budget.Application.csproj" />
-    <ProjectReference Include="..\Budget.API\Budget.API.csproj" />
   </ItemGroup>
 
 </Project>
