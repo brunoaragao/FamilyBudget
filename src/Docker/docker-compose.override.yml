@@ -10,9 +10,6 @@ services:
       - IdentityServer__Authority=http://identity-api
     ports:
       - "5000:80"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     restart: on-failure
 
   identity-api:
@@ -23,9 +20,6 @@ services:
       - Clients__BudgetSwagger__AllowedCorsOrigins=http://localhost:5000
     ports:
       - "5001:80"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   sqlserver:
     environment:
