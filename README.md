@@ -62,6 +62,8 @@ Para utilizar o aplicativo, você deve abrir a documentação do swagger atravé
 <!-- After that, you can use the swagger documentation to test the application. -->
 Após isso, você pode utilizar a documentação do swagger para testar o aplicativo.
 
+<img src="https://github.com/brunoaragao/FamilyBudget/blob/main/img/budget-swagger-doc.png">
+
 <!-- ## License 📝 -->
 ## Licença 📝
 
