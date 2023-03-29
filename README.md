@@ -1,70 +1,75 @@
-# Budget 🏦💰
+# Family Budget 🏦💰
 
-Budget - Family Budget Management
+<!-- Family Budget Management -->
+Gerenciamento de orçamento familiar.
 
-## Introduction 📖
+<!-- ## Introduction 📖 -->
+## Introdução 📖
 
-Welcome to Budget, a family budgeting app! With this app you can control your monthly expenses and income in a simple and easy way.
+<!-- Welcome to Family Budget, a family budgeting app! With this app you can control your monthly expenses and income in a simple and easy way. -->
+Bem-vindo ao Family Budget, um aplicativo de orçamento familiar! Com este aplicativo você pode controlar suas despesas e receitas mensais de uma maneira simples e fácil.
 
-## Technologies Used 🚀
+<!-- ## Technologies Used 🚀 -->
+## Tecnologias Utilizadas 🚀
 
-Budget was developed using the following technologies:
+<!-- Family Budget was developed using the following technologies: -->
+O Family Budget foi desenvolvido usando as seguintes tecnologias:
 
 - C# 11
 - .NET 7
-- ASP.NET
-- Entity Framework Core
-- SqlServer 2022
+- Entity Framework
+- SqlServer
 - Docker
-- Git
 - Swagger
 
-## Features 📋
+<!-- ## Features 📋 -->
+## Funcionalidades 📋
 
-Budget is a webservice that allows the CRUD of expenses and income, in addition to providing a monthly summary. To access the application, you must perform OAuth2 authentication.
+<!-- The application is divided into 2 services: -->
+O aplicativo é dividido em 2 serviços:
 
-In addition, Budget has a service called Identity that centralizes authentication using the Identity Server.
+<!-- - Budget: webservice that provides the CRUD of expenses and income, in addition to providing a monthly summary. -->
+- Budget: webservice que disponibiliza o CRUD de despesas e receitas, além de disponibilizar um resumo mensal.
+<!-- - Identity: webservice that centralizes authentication using the Identity Server. The Budget uses the Identity to perform authentication. -->
+- Identity: webservice que centraliza a autenticação utilizando o Identity Server. O Budget utiliza o Identity para realizar a autenticação.
 
-## How to Run 🏃‍♂️
+<!-- ## Requirements 📋 -->
+## Requisitos 📋
 
-Budget can be run locally or through Docker Compose. In both cases, the Budget service is mapped to port 5000.
+<!-- To run the application, you must have the following tools installed: -->
+Para executar o aplicativo, você deve ter as seguintes ferramentas instaladas:
 
-To run locally, follow the steps below:
+- [Docker](https://www.docker.com/products/docker-desktop)
 
-- Clone the repository: `git clone https://github.com/brunoaragao/Budget.git`
-- Open the project in Visual Studio and run the application.
-- Access the swagger documentation through the link http://localhost:5000/swagger/index.html.
+<!-- ## How to Run 🏃‍♂️ -->
+## Como Executar 🏃‍♂️
 
-To run with Docker, follow the steps below:
+<!-- Clone the repository: `git clone https://github.com/brunoaragao/FamilyBudget.git` -->
+Clone o repositório: `git clone https://github.com/brunoaragao/FamilyBudget.git`
 
-- Make sure you have Docker installed.
-- Clone the repository: `git clone https://github.com/brunoaragao/Budget.git`
-- Navigate to the `docker` folder.
-- Run the command `docker-compose up -d`.
-- Access the swagger documentation through the link http://localhost:5000/swagger/index.html.
+<!-- Open the terminal in the Docker folder and run the command `docker-compose up -d`, this will start the services in the background. -->
+Abra o terminal na pasta Docker e execute o comando `docker-compose up -d`, isso irá iniciar os serviços em segundo plano.
 
-## How to Use 📚
+<!-- ## How to Use 📚 -->
+## Como Utilizar 📚
 
-To use the application, you must open the swagger documentation and click on the `Authorize` button and use the default credentials:
+<!-- To use the application, you must open the swagger documentation through the link http://localhost:5000/swagger/index.html. Click on the `Authorize` button and use the default credentials: -->
+Para utilizar o aplicativo, você deve abrir a documentação do swagger através do link http://localhost:5000/swagger/index.html. Clique no botão `Authorize` e utilize as credenciais padrão:
 
 - client_id: `budget-swagger`
 - secret: `secret`
 
-After that, you can use the swagger documentation to test the application.
+<!-- After that, you can use the swagger documentation to test the application. -->
+Após isso, você pode utilizar a documentação do swagger para testar o aplicativo.
 
-## How to Contribute 🤝
+<!-- ## License 📝 -->
+## Licença 📝
 
-- Fork the repository.
-- Create a new branch with your changes: `git checkout -b my-feature`
-- Save your changes and create a commit message telling you what you did: `git commit -m "feature: My new feature"`
-- Submit your changes: `git push origin my-feature`
+<!-- This project is under the MIT license. See the [LICENSE](LICENSE) file for more details. -->
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-After the merge of your pull request is done, you can delete your branch.
+<!-- ## Acknowledgments -->
+## Agradecimentos
 
-## License 📝
-
-This project is under the MIT license. See the [LICENSE](LICENSE) file for more details.
-
-## Acknowledgments 🎁
-
-This project was developed as part of the [challenge](https://www.alura.com.br/challenges/back-end-2) proposed by Alura.
+<!-- This project was developed as part of the [challenge](https://www.alura.com.br/challenges/back-end-2) proposed by Alura. -->
+Este projeto foi desenvolvido como parte do [desafio](https://www.alura.com.br/challenges/back-end-2) proposto pela Alura.
